@@ -1,6 +1,8 @@
 # monitor-manage
 
-Simple AHK script to toggle between monitor sets. E.g two desktop monitors and one TV
+Simple AHK script to toggle between monitor sets. E.g two desktop monitors and one TV. 
+
+When one monitor set is enabled, the monitors in the other set are disabled. In my case, this helps resolve some GPU bandwidth issues I was experiencing. An added benefit is Steam Big Picture behaves much better on the TV when it's the only monitor enabled. 
 
 | Shortcut | Action |
 | -------- | ------ |
