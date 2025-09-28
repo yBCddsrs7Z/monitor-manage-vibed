@@ -1,24 +1,68 @@
 # monitor-manage
 
-Simple AHK script to toggle between monitor sets. E.g two desktop monitors and one TV. 
+AHK script to configure profiles of enabled / disabled displays and the default audio device. 
 
-When one monitor set is enabled, the monitors in the other set are disabled. In my case, this helps resolve some GPU bandwidth issues I was experiencing. An added benefit is Steam Big Picture behaves much better on the TV when it's the only monitor enabled. 
+- Create configs with names "1" through "9".
+- Switch to the config by pressing alt+n on your keyboard.
+- Cycle through all profiles in order with alt+0
 
-| Shortcut | Action |
-| -------- | ------ |
-| alt+1    | Switch to desktop monitors  |
-| alt+2    | Switch to TV                |
-| alt+3    | Toggle between the two sets |
+<details>
+  <summary>Example configuration:</summary>
+  
+```json
+{
+  "1": {
+    "audio": "Speakers (5- ODAC-revB USB DAC)",
+    "activeDisplays": [
+      "AW2725DF"
+    ],
+    "disableDisplays": [
+      "LG TV SSCR2"
+    ]
+  },
+  "2": {
+    "audio": "Speakers (5- ODAC-revB USB DAC)",
+    "activeDisplays": [
+      "AW2725DF",
+      "LG TV SSCR2"
+    ],
+    "disableDisplays": []
+  },
+  "3": {
+    "audio": "LG TV SSCR2 (NVIDIA High Definition Audio)",
+    "activeDisplays": [
+      "AW2725DF",
+      "LG TV SSCR2"
+    ],
+    "disableDisplays": []
+  },
+  "4": {
+    "audio": "LG TV SSCR2 (NVIDIA High Definition Audio)",
+    "activeDisplays": [
+      "LG TV SSCR2"
+    ],
+    "disableDisplays": [
+      "AW2725DF"
+    ]
+  }
+}
+```
+</details>
+   
+## Prerequisites
+Requires:
+- [AutoHotkey](https://www.autohotkey.com/download/)
+- Powershell modules
+  - Requires DisplayConfig - `Install-Module -Name DisplayConfig -RequiredVersion 5.0.0`
+  - Requires AudioDeviceCmdlets - `Install-Module -Name AudioDeviceCmdlets -Repository PSGallery -Force`
 
-## prereqs
-- Requires [DisplayConfig@5.0.0](https://www.powershellgallery.com/packages/DisplayConfig/5.0.0)
-- Require `AudioDeviceCmdlets` - `Install-Module -Name AudioDeviceCmdlets -Repository PSGallery -Force`
-
-Can be configured to be triggered with SteamInput!
-
-Also should be set up as a script on startup:
-- Fill desired audio devices into `config.json` by retrieving name through `Get-AudioDevice -List`
-- Create shortcut of monitor-toggle.ahk
-- Ensure AHK is used to automatically open the shortcut
+Usage guide:
+- Install prerequisites
+- Create profiles in `config.json`
+  - Find display names through `Get-DisplayInfo`
+  - Find audio device names through `Get-AudioDevice -List`
+- Create shortcut of `monitor-toggle.ahk`
+- Choose AHK as the default program for `.ahk` files
 - Open startup folder with Win+R `shell:startup`
 - Move the shortcut into the folder
+- Note: Updates to the config file will only take effect if you re-open `monitor-toggle.ahk`
