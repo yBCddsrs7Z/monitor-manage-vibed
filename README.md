@@ -58,6 +58,7 @@ Requires:
 
 Usage guide:
 - Install prerequisites
+- Clone repository / download files to Documents folder
 - Create profiles in `config.json`
   - Find display names through `Get-DisplayInfo`
   - Find audio device names through `Get-AudioDevice -List`
