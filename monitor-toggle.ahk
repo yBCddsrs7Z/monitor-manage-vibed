@@ -17,7 +17,9 @@ Hotkey("!0", CycleConfigs)
 
 SetConfig(controlGroup, hotkeyName) {
     Run('powershell -ExecutionPolicy Bypass -File "' scriptsDir '\switch_control_group.ps1" ' controlGroup)
-    FileDelete(active_profile)
+    if FileExist(active_profile) {
+        FileDelete(active_profile)
+    }
     FileAppend(controlGroup, active_profile)
 }
 

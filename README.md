@@ -3,6 +3,7 @@
 AHK script to configure profiles of enabled / disabled displays and the default audio device. 
 
 - Create configs with names "1" through "9".
+- First display in each config will be set to primary.
 - Switch to the config by pressing alt+n on your keyboard.
 - Cycle through all profiles in order with alt+0
 

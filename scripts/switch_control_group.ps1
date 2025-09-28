@@ -8,11 +8,19 @@ $config = (Get-Content -Path  "$([Environment]::GetFolderPath("MyDocuments"))/mo
 $displaysToEnable = $config.$controlGroup.activeDisplays
 $displaysToDisable = $config.$controlGroup.disableDisplays
 
+$isFirstConfigDisplay = $true
 foreach ($display in $displaysToEnable) {
     $displayObj = (Get-DisplayInfo | Where-Object {$_.DisplayName -eq $display})
     if (!$displayObj.Active) {
         Enable-Display $displayObj.DisplayId
     }
+
+    if ($isFirstConfigDisplay) {
+        if (!$displayObj.Primary) {
+            Set-DisplayPrimary $displayObj.DisplayId
+        }
+    }
+    $isFirstConfigDisplay = $false
 }
 
 foreach ($display in $displaysToDisable) {
