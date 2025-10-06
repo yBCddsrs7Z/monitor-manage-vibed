@@ -711,9 +711,11 @@ NormalizeConfigStructure(config) {
         changed := true
     }
 
+    ; Move legacy top-level profile keys into the profiles section
+    ; (but exclude metadata keys like _documentation and settings)
     legacyKeys := []
     for key, value in config {
-        if (key != "hotkeys" && key != "overlay" && key != "profiles") {
+        if (key != "hotkeys" && key != "overlay" && key != "profiles" && key != "_documentation" && key != "settings") {
             legacyKeys.Push(key)
         }
     }
