@@ -1,2 +1,20 @@
 /scripts/active_profile
+config.json
+config.json.*
 config_*.json
+*.bak
+*.bk
+*.bk[0-9]
+*.bk[0-9][0-9]
+monitor-toggle.log
+devices_snapshot.json
+last_error.txt
+
+# Test artifacts
+tests/*.xml
+tests/*.txt
+tests/debug-*.ps1
+tests/devices_snapshot.*.json
+tests/snapshot.*.json
+# Git backup
+.git.backup/
