@@ -755,7 +755,7 @@ NormalizeConfigStructure(config) {
         }
     }
 
-    Loop 7 {
+    Loop 6 {
         key := String(A_Index)
         if !profileHotkeys.Has(key) {
             profileHotkeys[key] := NormalizeHotkeyDescriptor(GetDefaultProfileHotkeyDescriptor(key))
