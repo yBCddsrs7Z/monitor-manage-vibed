@@ -177,11 +177,23 @@ Six empty profiles (`"1"`-`"6"`) are provided by default. Add additional numeric
 - **`durationMs`**: How long the overlay remains visible before auto-hide.
 - **`opacity`**: 0-255 (lower is more transparent).
 
-## Startup (Optional)
-If you want the hotkeys available after login:
-- **Create a shortcut** to `monitor-toggle.ahk`
-- **Open** the Startup folder (`Win + R`, then `shell:startup`)
-- **Place the shortcut** in the folder so AutoHotkey launches automatically with Windows
+## Run on Startup (Optional)
 
+To make monitor-manage start automatically when you log in:
+
+### Automatic (One-liner)
+```powershell
+$WshShell = New-Object -comObject WScript.Shell; $Shortcut = $WshShell.CreateShortcut("$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Startup\monitor-toggle.lnk"); $Shortcut.TargetPath = (Resolve-Path "monitor-toggle.ahk").Path; $Shortcut.WorkingDirectory = $PWD.Path; $Shortcut.Save(); Write-Host "✓ Startup shortcut created!" -ForegroundColor Green
+```
+Run this from the monitor-manage directory to automatically create the startup shortcut.
+
+### Manual
+1. **Create a shortcut** to `monitor-toggle.ahk`
+2. **Open** the Startup folder: Press `Win + R`, type `shell:startup`, press Enter
+3. **Move the shortcut** into the Startup folder
+
+AutoHotkey will now launch automatically with Windows.
+
+### Alternative
 You can also map the hotkeys through Steam Input or other automation tools once `monitor-toggle.ahk` is running.
 
