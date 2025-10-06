@@ -75,33 +75,33 @@ function Test-ConfigStructure {
                 continue
             }
             
-            $profile = $config.profiles.$key
+            $profileData = $config.profiles.$key
             
             # Check required fields
             $requiredProfileKeys = @('activeDisplays', 'disableDisplays', 'audio')
             foreach ($profileKey in $requiredProfileKeys) {
-                if (-not $profile.PSObject.Properties[$profileKey]) {
+                if (-not $profileData.PSObject.Properties[$profileKey]) {
                     $errors += "profile '$key' missing required field: '$profileKey'"
                 }
             }
 
             # Validate field types
-            if ($profile.PSObject.Properties['activeDisplays']) {
-                $val = $profile.activeDisplays
+            if ($profileData.PSObject.Properties['activeDisplays']) {
+                $val = $profileData.activeDisplays
                 if ($null -ne $val -and $val -isnot [Array] -and $val -isnot [string]) {
                     $errors += "profile '$key': activeDisplays must be array or string"
                 }
             }
 
-            if ($profile.PSObject.Properties['disableDisplays']) {
-                $val = $profile.disableDisplays
+            if ($profileData.PSObject.Properties['disableDisplays']) {
+                $val = $profileData.disableDisplays
                 if ($null -ne $val -and $val -isnot [Array] -and $val -isnot [string]) {
                     $errors += "profile '$key': disableDisplays must be array or string"
                 }
             }
 
-            if ($profile.PSObject.Properties['audio']) {
-                $val = $profile.audio
+            if ($profileData.PSObject.Properties['audio']) {
+                $val = $profileData.audio
                 if ($null -ne $val -and $val -isnot [string]) {
                     $errors += "profile '$key': audio must be string"
                 }
@@ -185,8 +185,8 @@ if (-not $env:MONITOR_MANAGE_VALIDATION_TEST_MODE) {
     } else {
         Write-Host "✗ Configuration is invalid" -ForegroundColor Red
         Write-Host "`nErrors:" -ForegroundColor Red
-        foreach ($error in $result.Errors) {
-            Write-Host "  - $error" -ForegroundColor Red
+        foreach ($errorMsg in $result.Errors) {
+            Write-Host "  - $errorMsg" -ForegroundColor Red
         }
         if ($result.Warnings.Count -gt 0) {
             Write-Host "`nWarnings:" -ForegroundColor Yellow

@@ -44,11 +44,16 @@ jobs:
           Write-Host "Running test suite..."
           pwsh -File tests/run-all-tests.ps1
         
-      - name: Validate configuration schema
+      - name: Validate configuration schema (if exists)
         shell: pwsh
         run: |
-          Write-Host "Validating config.json schema..."
-          pwsh -File scripts/Validate-Config.ps1 -ConfigPath config.json
+          if (Test-Path config.json) {
+            Write-Host "Validating config.json schema..."
+            pwsh -File scripts/Validate-Config.ps1 -ConfigPath config.json
+          } else {
+            Write-Host "config.json not found (expected - it's user-specific and gitignored)"
+            Write-Host "Validation will run when users create their config"
+          }
       
       - name: Check for PowerShell syntax errors
         shell: pwsh
