@@ -68,6 +68,13 @@ function Test-ConfigStructure {
         }
 
         foreach ($key in $profileKeys) {
+            # Validate profile key is numeric
+            $num = 0
+            if (-not [int]::TryParse($key, [ref]$num)) {
+                $errors += "Profile key '$key' is not numeric. Profile keys must be numbers (1, 2, 3, etc.)"
+                continue
+            }
+            
             $profile = $config.profiles.$key
             
             # Check required fields

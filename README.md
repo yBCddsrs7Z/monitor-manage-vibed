@@ -163,6 +163,8 @@ This project has comprehensive test coverage including **PowerShell** and **Auto
 ### Profiles (`profiles`)
 Six empty profiles (`"1"`-`"6"`) are provided by default. Add additional numeric keys if you need more saved layouts.
 
+**Important:** Profile keys must be numeric (e.g., `"1"`, `"2"`, `"7"`). Non-numeric keys will be rejected.
+
 ### Hotkeys (`hotkeys`)
 - **`profiles`**: Provide readable descriptors such as `Alt+Shift+1`, `Ctrl+Alt+F1`, or `Left Win+Shift+P`. Modifiers support `Alt`, `Shift`, `Ctrl`, `Win`, optionally prefixed with `Left`/`Right`.
 - **`cycleAudio` / `enableAll` / `openConfigurator` / `toggleOverlay`**: Set to any descriptor. Defaults remain `Alt+Shift+7`, `Alt+Shift+8`, `Alt+Shift+9`, and `Alt+Shift+0` respectively.

@@ -20,16 +20,41 @@ global config_file := baseDir "\config.json"
 global log_file := baseDir "\monitor-toggle.log"
 global devices_file := baseDir "\devices_snapshot.json"
 global repoRoot := baseDir  ; Same as baseDir for error file location
+global configWasCreated := false  ; Track if this is first run
 overlayVisible := false
 overlayGui := 0
 overlaySettingsCache := ""
 
 EnsureScriptsDirectory()
 
+; Show startup notification
+ShowNotification("Starting up...")
+
 ; Load the configuration from the JSON file.
 config := LoadConfig()
 if !IsObject(config) {
     ShowFatalError("Unable to load configuration data.")
+}
+
+; Validate configuration
+ShowNotification("Verifying config...")
+isValid := ValidateConfigAndNotify()
+
+if isValid {
+    ShowNotification("Verification complete")
+    Sleep(1000)
+    
+    ; Show appropriate message based on whether this is first run
+    if configWasCreated {
+        ; First time user
+        ShowNotification("Looks like you're using this script for the first time!`n`nPress Left Alt+Left Shift+9 to configure your profiles")
+    } else {
+        ; Regular user - show ready message then overlay
+        ShowNotification("Script ready to be used")
+        Sleep(1500)
+        ; Show the profile overlay (Alt+Shift+0 equivalent)
+        ToggleProfileOverlay()
+    }
 }
 
 ConvertAhkHotkeyToDescriptor(hotkey) {
@@ -711,6 +736,26 @@ NormalizeConfigStructure(config) {
         changed := true
     }
 
+    ; Remove non-numeric profile keys (profiles must be numbered)
+    invalidKeys := []
+    for key, value in profiles {
+        ; Skip metadata keys (allowed non-numeric)
+        if (SubStr(key, 1, 1) = "_") {
+            continue
+        }
+        ; Check if key is numeric
+        if !(key is "Integer" || RegExMatch(key, "^\d+$")) {
+            invalidKeys.Push(key)
+            LogMessage("Warning: Removing non-numeric profile key '" key "'. Profile keys must be numbers.")
+        }
+    }
+    
+    ; Remove invalid keys
+    for _, key in invalidKeys {
+        profiles.Delete(key)
+        changed := true
+    }
+
     ; Move legacy top-level profile keys into the profiles section
     ; (but exclude metadata keys like _documentation and settings)
     legacyKeys := []
@@ -949,7 +994,7 @@ ShowFatalError(message) {
     ExitApp()
 }
 LoadConfig() {
-    global config_file
+    global config_file, configWasCreated
 
     created := false
 
@@ -959,6 +1004,7 @@ LoadConfig() {
         try {
             WriteConfigToFile(defaultConfig)
             created := true
+            configWasCreated := true  ; Set global flag for first-time use detection
         } catch Error as err {
             ShowFatalError("Unable to create configuration file.`r`n" err.Message)
         }
@@ -1296,9 +1342,63 @@ ShowNotification(message) {
     overlaySettingsCache := originalCache
 }
 
-
-
-
+ValidateConfigAndNotify() {
+    global config_file, scriptsDir
+    
+    ; Run validation script
+    validateScript := scriptsDir . "\Validate-Config.ps1"
+    if !FileExist(validateScript) {
+        LogMessage("Warning: Validate-Config.ps1 not found, skipping validation")
+        return true  ; Assume valid if validator not found
+    }
+    
+    ; Execute validation and capture output
+    command := 'pwsh.exe -NoProfile -ExecutionPolicy Bypass -File "' validateScript '" -ConfigPath "' config_file '" 2>&1'
+    try {
+        output := ComObjCreate("WScript.Shell").Exec(command).StdOut.ReadAll()
+    } catch Error as err {
+        LogMessage("Failed to run validation: " err.Message)
+        return true  ; Assume valid if validation failed to run
+    }
+    
+    ; Check if validation failed (contains "✗" or "Configuration is invalid")
+    if (InStr(output, "✗") || InStr(output, "invalid")) {
+        LogMessage("Config validation failed:`n" output)
+        
+        errorMsg := "⚠️ Configuration Errors Detected`n`n"
+        errorMsg .= "Your config.json has validation issues.`n`n"
+        errorMsg .= "Issues found:`n" SubStr(output, 1, 500)
+        
+        if (StrLen(output) > 500) {
+            errorMsg .= "`n... (see monitor-toggle.log for full details)"
+        }
+        
+        errorMsg .= "`n`n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`n"
+        errorMsg .= "🔧 To fix:`n"
+        errorMsg .= "1. Delete config.json and restart (will create fresh config)`n"
+        errorMsg .= "2. Or manually fix the issues in config.json`n"
+        errorMsg .= "3. Or press Alt+Shift+9 to open configurator`n`n"
+        errorMsg .= "Check monitor-toggle.log for full validation details."
+        
+        result := MsgBox(errorMsg, "Configuration Validation Failed", "Icon! OKCancel")
+        
+        if (result = "OK") {
+            ; User acknowledged, log it
+            LogMessage("User acknowledged validation errors - continuing with caution")
+            return false  ; Validation failed but user acknowledged
+        } else {
+            ; User cancelled - exit
+            LogMessage("User cancelled after validation errors - exiting")
+            ExitApp()
+        }
+    } else if (InStr(output, "✓") || InStr(output, "valid")) {
+        LogMessage("Config validation passed")
+        return true
+    }
+    
+    ; Default to valid if output unclear
+    return true
+}
 
 
 
