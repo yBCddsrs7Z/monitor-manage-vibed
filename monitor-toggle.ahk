@@ -747,6 +747,7 @@ NormalizeConfigStructure(config) {
 
     profileHotkeys := hotkeys["profiles"]
 
+    ; Normalize existing profile hotkeys
     for profileKey, existing in profileHotkeys {
         normalized := NormalizeHotkeyDescriptor(existing)
         if (normalized != existing) {
@@ -755,15 +756,9 @@ NormalizeConfigStructure(config) {
         }
     }
 
+    ; Ensure default profiles 1-6 exist
     Loop 6 {
         key := String(A_Index)
-        if !profileHotkeys.Has(key) {
-            profileHotkeys[key] := NormalizeHotkeyDescriptor(GetDefaultProfileHotkeyDescriptor(key))
-            changed := true
-        }
-    }
-
-    for key, value in profiles {
         if !profileHotkeys.Has(key) {
             profileHotkeys[key] := NormalizeHotkeyDescriptor(GetDefaultProfileHotkeyDescriptor(key))
             changed := true
