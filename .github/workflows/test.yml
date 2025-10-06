@@ -28,11 +28,9 @@ jobs:
       - name: Install Pester
         shell: pwsh
         run: |
-          if (-not (Get-Module -ListAvailable -Name Pester)) {
-            Write-Host "Installing Pester..."
-            Install-Module -Name Pester -Force -Scope CurrentUser -SkipPublisherCheck
-          }
-          Import-Module Pester
+          Write-Host "Installing Pester 5.x..."
+          Install-Module -Name Pester -MinimumVersion 5.0 -MaximumVersion 5.9999 -Force -Scope CurrentUser -SkipPublisherCheck
+          Import-Module Pester -Force
           Write-Host "Pester version: $((Get-Module Pester).Version)"
       
       - name: Run all tests

@@ -19,9 +19,9 @@ Describe 'Resolve-DisplayIdentifiers' {
 
         $result = Resolve-DisplayIdentifiers -References $references -KnownDisplays $knownDisplays
 
-        if ($result.Ids.Length -ne 1) { throw 'Expected one resolved display identifier.' }
-        if ($result.Ids[0] -ne 101) { throw 'Resolved display identifier mismatch.' }
-        if ($result.Missing.Count -ne 0) { throw 'No displays should be reported missing.' }
+        $result.Ids.Length | Should -Be 1
+        $result.Ids[0] | Should -Be 101
+        $result.Missing.Count | Should -Be 0
     }
 
     It 'resolves displays using normalized names when formatting differs' {
@@ -40,9 +40,9 @@ Describe 'Resolve-DisplayIdentifiers' {
 
         $result = Resolve-DisplayIdentifiers -References $references -KnownDisplays $knownDisplays
 
-        if ($result.Ids.Length -ne 1) { throw 'Expected one resolved display identifier via normalized name.' }
-        if ($result.Ids[0] -ne 202) { throw 'Resolved normalized display identifier mismatch.' }
-        if ($result.Missing.Count -ne 0) { throw 'Normalized match should yield no missing displays.' }
+        $result.Ids.Length | Should -Be 1
+        $result.Ids[0] | Should -Be 202
+        $result.Missing.Count | Should -Be 0
     }
 
     It 'reports missing displays when not found' {
@@ -61,29 +61,29 @@ Describe 'Resolve-DisplayIdentifiers' {
 
         $result = Resolve-DisplayIdentifiers -References $references -KnownDisplays $knownDisplays
 
-        if ($result.Ids.Length -ne 0) { throw 'Expected no resolved IDs for unknown display.' }
-        if ($result.Missing.Count -ne 1) { throw 'Expected one missing display.' }
+        $result.Ids.Length | Should -Be 0
+        $result.Missing.Count | Should -Be 1
     }
 }
 
 Describe 'ConvertTo-DisplayReferenceArray' {
     It 'returns array for single display reference' {
-        $input = @([ordered]@{ name = 'Display One'; displayId = '101' })
-        $result = @(ConvertTo-DisplayReferenceArray $input)
+        $testInput = @([ordered]@{ name = 'Display One'; displayId = '101' })
+        $result = @(ConvertTo-DisplayReferenceArray $testInput)
 
-        if ($result -isnot [Array]) { throw 'Result should be an array.' }
-        if (($result | Measure-Object).Count -ne 1) { throw 'Expected one item.' }
+        $result | Should -BeOfType [Array]
+        ($result | Measure-Object).Count | Should -Be 1
     }
 
     It 'returns array for multiple display references' {
-        $input = @(
+        $testInput = @(
             [ordered]@{ name = 'Display One'; displayId = '101' },
             [ordered]@{ name = 'Display Two'; displayId = '202' }
         )
-        $result = ConvertTo-DisplayReferenceArray $input
+        $result = ConvertTo-DisplayReferenceArray $testInput
 
-        if ($result -isnot [Array]) { throw 'Result should be an array.' }
-        if (($result | Measure-Object).Count -ne 2) { throw 'Expected two items.' }
+        $result | Should -BeOfType [Array]
+        ($result | Measure-Object).Count | Should -Be 2
     }
 }
 
@@ -100,8 +100,8 @@ Describe 'Get-DisplaysFromSnapshotFile' {
 
         $result = @(Get-DisplaysFromSnapshotFile -SnapshotPath $tempSnapshot)
 
-        if ($result -isnot [Array]) { throw 'Result should be an array even with single display.' }
-        if (($result | Measure-Object).Count -ne 1) { throw 'Expected one display.' }
+        $result | Should -BeOfType [Array]
+        ($result | Measure-Object).Count | Should -Be 1
 
         Remove-Item -Path $tempSnapshot -Force
     }
@@ -109,8 +109,8 @@ Describe 'Get-DisplaysFromSnapshotFile' {
     It 'returns empty array for missing snapshot file' {
         $result = @(Get-DisplaysFromSnapshotFile -SnapshotPath 'nonexistent.json')
 
-        if ($null -eq $result) { throw 'Result should not be null.' }
-        if (($result | Measure-Object).Count -ne 0) { throw 'Expected empty array for missing file.' }
+        $result | Should -Not -BeNullOrEmpty
+        ($result | Measure-Object).Count | Should -Be 0
     }
 }
 
@@ -118,37 +118,37 @@ Describe 'Get-NormalizedDisplayName' {
     It 'normalizes display name by removing spaces and special characters' {
         $result = Get-NormalizedDisplayName 'Generic Display 27'
 
-        if ($result -ne 'genericdisplay27') { throw 'Normalization should remove spaces and convert to lowercase.' }
+        $result | Should -Be 'genericdisplay27'
     }
 
     It 'normalizes display name with hyphens' {
         $result = Get-NormalizedDisplayName 'Display-One'
 
-        if ($result -ne 'displayone') { throw 'Normalization should remove hyphens.' }
+        $result | Should -Be 'displayone'
     }
 
     It 'returns null for empty string' {
         $result = Get-NormalizedDisplayName ''
 
-        if ($null -ne $result) { throw 'Expected null for empty string.' }
+        $result | Should -BeNullOrEmpty
     }
 
     It 'handles null input gracefully' {
         $result = Get-NormalizedDisplayName $null
 
-        if ($null -ne $result) { throw 'Expected null for null input.' }
+        $result | Should -BeNullOrEmpty
     }
 
     It 'handles whitespace-only input' {
         $result = Get-NormalizedDisplayName '   '
 
-        if ($null -ne $result) { throw 'Expected null for whitespace-only input.' }
+        $result | Should -BeNullOrEmpty
     }
 
     It 'handles special characters only' {
         $result = Get-NormalizedDisplayName '---@@@___'
 
-        if ($null -ne $result) { throw 'Expected null when all characters are stripped.' }
+        $result | Should -BeNullOrEmpty
     }
 }
 

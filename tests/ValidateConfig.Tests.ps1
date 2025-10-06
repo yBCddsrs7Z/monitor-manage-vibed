@@ -23,8 +23,8 @@ Describe 'Test-ConfigStructure' {
     It 'returns false for non-existent config file' {
         $result = Test-ConfigStructure -ConfigPath 'nonexistent.json'
         
-        if ($result.IsValid -ne $false) { throw 'Should be invalid for non-existent file' }
-        if ($result.Errors.Count -eq 0) { throw 'Should have errors' }
+        $result.IsValid | Should -Be $false
+        $result.Errors.Count | Should -BeGreaterThan 0
     }
 
     It 'returns false for invalid JSON' {
@@ -33,8 +33,8 @@ Describe 'Test-ConfigStructure' {
         
         $result = Test-ConfigStructure -ConfigPath $testFile
         
-        if ($result.IsValid -ne $false) { throw 'Should be invalid for malformed JSON' }
-        if ($result.Errors.Count -eq 0) { throw 'Should have errors' }
+        $result.IsValid | Should -Be $false
+        $result.Errors.Count | Should -BeGreaterThan 0
     }
 
     It 'returns false for missing required top-level keys' {
@@ -46,8 +46,8 @@ Describe 'Test-ConfigStructure' {
         
         $result = Test-ConfigStructure -ConfigPath $testFile
         
-        if ($result.IsValid -ne $false) { throw 'Should be invalid for missing keys' }
-        if ($result.Errors.Count -lt 2) { throw 'Should have errors for missing hotkeys and overlay' }
+        $result.IsValid | Should -Be $false
+        $result.Errors.Count | Should -BeGreaterOrEqual 2
     }
 
     It 'returns true for valid minimal config' {
@@ -85,10 +85,7 @@ Describe 'Test-ConfigStructure' {
         
         $result = Test-ConfigStructure -ConfigPath $testFile
         
-        if ($result.IsValid -ne $true) {
-            Write-Host "Errors: $($result.Errors -join ', ')"
-            throw 'Should be valid for complete config'
-        }
+        $result.IsValid | Should -Be $true
     }
 
     It 'detects invalid profile structure' {
@@ -123,8 +120,8 @@ Describe 'Test-ConfigStructure' {
         
         $result = Test-ConfigStructure -ConfigPath $testFile
         
-        if ($result.IsValid -ne $false) { throw 'Should be invalid for incomplete profile' }
-        if ($result.Errors.Count -lt 2) { throw 'Should have errors for missing fields' }
+        $result.IsValid | Should -Be $false
+        $result.Errors.Count | Should -BeGreaterOrEqual 2
     }
 
     It 'detects invalid overlay opacity' {
@@ -160,7 +157,7 @@ Describe 'Test-ConfigStructure' {
         
         $result = Test-ConfigStructure -ConfigPath $testFile
         
-        if ($result.IsValid -ne $false) { throw 'Should be invalid for opacity > 255' }
+        $result.IsValid | Should -Be $false
     }
 
     It 'detects invalid overlay position' {
@@ -196,7 +193,7 @@ Describe 'Test-ConfigStructure' {
         
         $result = Test-ConfigStructure -ConfigPath $testFile
         
-        if ($result.IsValid -ne $false) { throw 'Should be invalid for invalid position' }
+        $result.IsValid | Should -Be $false
     }
 }
 

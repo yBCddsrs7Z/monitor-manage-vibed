@@ -21,7 +21,7 @@ Describe 'Get-PropertyValue' {
         }
 
         $result = Get-PropertyValue -Object $obj -Names @('Name')
-        if ($result -ne 'Test Value') { throw 'Property retrieval failed.' }
+        $result | Should -Be 'Test Value'
     }
 
     It 'returns first matching property from list' {
@@ -31,7 +31,7 @@ Describe 'Get-PropertyValue' {
         }
 
         $result = Get-PropertyValue -Object $obj -Names @('Name', 'DisplayName')
-        if ($result -ne 'Name Value') { throw 'First property should match.' }
+        $result | Should -Be 'Name Value'
     }
 
     It 'returns null when no property matches' {
@@ -40,7 +40,7 @@ Describe 'Get-PropertyValue' {
         }
 
         $result = Get-PropertyValue -Object $obj -Names @('Name', 'DisplayName')
-        if ($null -ne $result) { throw 'Expected null for non-existent properties.' }
+        $result | Should -BeNullOrEmpty
     }
 }
 
@@ -58,14 +58,12 @@ Describe 'Export Devices Integration' {
         
         $mockData | ConvertTo-Json -Depth 4 | Set-Content -Path $tempOutput -Encoding UTF8
         
-        if (-not (Test-Path $tempOutput)) {
-            throw 'Export file was not created.'
-        }
+        Test-Path $tempOutput | Should -Be $true
         
         $content = Get-Content -Path $tempOutput -Raw | ConvertFrom-Json
-        if ($null -eq $content.Timestamp) { throw 'Timestamp missing.' }
-        if ($null -eq $content.Displays) { throw 'Displays array missing.' }
-        if ($null -eq $content.AudioDevices) { throw 'AudioDevices array missing.' }
+        $content.Timestamp | Should -Not -BeNullOrEmpty
+        $content.Displays | Should -Not -BeNull
+        $content.AudioDevices | Should -Not -BeNull
         
         Remove-Item -Path $tempOutput -Force
     }

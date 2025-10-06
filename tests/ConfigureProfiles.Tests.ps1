@@ -19,11 +19,11 @@ Describe 'Get-DeviceInventory' {
 
         $displays, $audio = Get-DeviceInventory
 
-        if (($displays | Measure-Object).Count -ne 2) { throw 'Expected two display entries.' }
-        if ($displays[0].name -ne 'Display One') { throw 'First display name mismatch.' }
-        if ($displays[0].displayId -ne '101') { throw 'First display ID mismatch.' }
-        if ($displays[1].name -ne 'Display Two') { throw 'Second display name mismatch.' }
-        if ($displays[1].displayId -ne '202') { throw 'Second display ID mismatch.' }
+        ($displays | Measure-Object).Count | Should -Be 2
+        $displays[0].name | Should -Be 'Display One'
+        $displays[0].displayId | Should -Be '101'
+        $displays[1].name | Should -Be 'Display Two'
+        $displays[1].displayId | Should -Be '202'
 
         Remove-Item -Path $tempSnapshot -Force
     }
@@ -43,9 +43,9 @@ Describe 'Get-DeviceInventory' {
 
         $displays, $audio = Get-DeviceInventory
 
-        if (($displays | Measure-Object).Count -ne 1) { throw 'Expected one display entry.' }
-        if ($displays -isnot [Array]) { throw 'Result should be an array even with single item.' }
-        if ($displays[0].name -ne 'Display One') { throw 'Display name mismatch.' }
+        ($displays | Measure-Object).Count | Should -Be 1
+        $displays | Should -BeOfType [Array]
+        $displays[0].name | Should -Be 'Display One'
 
         Remove-Item -Path $tempSnapshot -Force
     }
@@ -55,12 +55,12 @@ Describe 'Get-DeviceInventory' {
 
         $displays, $audio, $microphones = Get-DeviceInventory
 
-        if ($null -eq $displays) { throw 'Displays should not be null.' }
-        if ($null -eq $audio) { throw 'Audio should not be null.' }
-        if ($null -eq $microphones) { throw 'Microphones should not be null.' }
-        if (($displays | Measure-Object).Count -ne 0) { throw 'Expected empty displays array.' }
-        if (($audio | Measure-Object).Count -ne 0) { throw 'Expected empty audio array.' }
-        if (($microphones | Measure-Object).Count -ne 0) { throw 'Expected empty microphones array.' }
+        $displays | Should -Not -BeNullOrEmpty
+        $audio | Should -Not -BeNullOrEmpty
+        $microphones | Should -Not -BeNullOrEmpty
+        ($displays | Measure-Object).Count | Should -Be 0
+        ($audio | Measure-Object).Count | Should -Be 0
+        ($microphones | Measure-Object).Count | Should -Be 0
     }
 }
 
@@ -78,11 +78,11 @@ Describe 'Merge-DisplayReferences' {
 
         $result = Merge-DisplayReferences -References $selected -Available $available
 
-        if (($result | Measure-Object).Count -ne 2) { throw 'Expected two merged display references.' }
-        if ($result[0].name -ne 'Display One') { throw 'Merged display one name mismatch.' }
-        if ($result[0].displayId -ne '101') { throw 'Merged display one ID mismatch.' }
-        if ($result[1].name -ne 'Display Two') { throw 'Merged display two name mismatch.' }
-        if ($result[1].displayId -ne '202') { throw 'Merged display two ID mismatch.' }
+        ($result | Measure-Object).Count | Should -Be 2
+        $result[0].name | Should -Be 'Display One'
+        $result[0].displayId | Should -Be '101'
+        $result[1].name | Should -Be 'Display Two'
+        $result[1].displayId | Should -Be '202'
     }
 
     It 'merges display references with available displays' {
@@ -96,9 +96,9 @@ Describe 'Merge-DisplayReferences' {
 
         $result = @(Merge-DisplayReferences -References $selected -Available $available)
 
-        if (($result | Measure-Object).Count -ne 1) { throw 'Expected one merged display reference.' }
-        if ($result[0].displayId -ne '101') { throw 'Display ID should be populated from available displays.' }
-        if ($result[0].name -ne 'Display One') { throw 'Display name should be preserved.' }
+        ($result | Measure-Object).Count | Should -Be 1
+        $result[0].displayId | Should -Be '101'
+        $result[0].name | Should -Be 'Display One'
     }
 
     It 'returns array even with single merged reference' {
@@ -112,36 +112,36 @@ Describe 'Merge-DisplayReferences' {
 
         $result = @(Merge-DisplayReferences -References $selected -Available $available)
 
-        if ($result -isnot [Array]) { throw 'Result should be an array even with single item.' }
-        if (($result | Measure-Object).Count -ne 1) { throw 'Expected one merged display reference.' }
+        $result | Should -BeOfType [Array]
+        ($result | Measure-Object).Count | Should -Be 1
     }
 }
 
 Describe 'ConvertTo-DisplayReferenceArray' {
     It 'returns array for single item' {
-        $input = @([ordered]@{ name = 'Display One'; displayId = '101' })
-        $result = @(ConvertTo-DisplayReferenceArray $input)
+        $testInput = @([ordered]@{ name = 'Display One'; displayId = '101' })
+        $result = @(ConvertTo-DisplayReferenceArray $testInput)
 
-        if ($result -isnot [Array]) { throw 'Result should be an array.' }
-        if (($result | Measure-Object).Count -ne 1) { throw 'Expected one item.' }
+        $result | Should -BeOfType [Array]
+        ($result | Measure-Object).Count | Should -Be 1
     }
 
     It 'returns array for multiple items' {
-        $input = @(
+        $testInput = @(
             [ordered]@{ name = 'Display One'; displayId = '101' },
             [ordered]@{ name = 'Display Two'; displayId = '202' }
         )
-        $result = ConvertTo-DisplayReferenceArray $input
+        $result = ConvertTo-DisplayReferenceArray $testInput
 
-        if ($result -isnot [Array]) { throw 'Result should be an array.' }
-        if (($result | Measure-Object).Count -ne 2) { throw 'Expected two items.' }
+        $result | Should -BeOfType [Array]
+        ($result | Measure-Object).Count | Should -Be 2
     }
 
     It 'returns empty array for null input' {
         $result = @(ConvertTo-DisplayReferenceArray $null)
 
-        if ($null -eq $result) { throw 'Result should not be null.' }
-        if (($result | Measure-Object).Count -ne 0) { throw 'Expected empty array.' }
+        $result | Should -Not -BeNullOrEmpty
+        ($result | Measure-Object).Count | Should -Be 0
     }
 }
 
@@ -157,8 +157,8 @@ Describe 'Get-ProfileEntries' {
 
         $result = @(Get-ProfileEntries -Config $config)
 
-        if ($result -isnot [Array]) { throw 'Result should be an array even with single profile.' }
-        if (($result | Measure-Object).Count -ne 1) { throw 'Expected one entry.' }
+        $result | Should -BeOfType [Array]
+        ($result | Measure-Object).Count | Should -Be 1
     }
 
     It 'returns array for multiple profiles' {
@@ -170,31 +170,31 @@ Describe 'Get-ProfileEntries' {
 
         $result = Get-ProfileEntries -Config $config
 
-        if ($result -isnot [Array]) { throw 'Result should be an array.' }
-        if (($result | Measure-Object).Count -ne 3) { throw 'Expected three entries.' }
+        $result | Should -BeOfType [Array]
+        ($result | Measure-Object).Count | Should -Be 3
     }
 }
 
 Describe 'ConvertTo-NameArray' {
     It 'returns array for single name' {
-        $input = @([ordered]@{ name = 'Display One' })
-        $result = @(ConvertTo-NameArray $input)
+        $testInput = @([ordered]@{ name = 'Display One' })
+        $result = @(ConvertTo-NameArray $testInput)
 
-        if ($result -isnot [Array]) { throw 'Result should be an array.' }
-        if (($result | Measure-Object).Count -ne 1) { throw 'Expected one name.' }
-        if ($result[0] -ne 'Display One') { throw 'Name mismatch.' }
+        $result | Should -BeOfType [Array]
+        ($result | Measure-Object).Count | Should -Be 1
+        $result[0] | Should -Be 'Display One'
     }
 
     It 'filters out empty names' {
-        $input = @(
+        $testInput = @(
             [ordered]@{ name = 'Display One' },
             [ordered]@{ name = '' },
             [ordered]@{ name = 'Display Two' }
         )
-        $result = ConvertTo-NameArray $input
+        $result = ConvertTo-NameArray $testInput
 
-        if ($result -isnot [Array]) { throw 'Result should be an array.' }
-        if (($result | Measure-Object).Count -ne 2) { throw 'Expected two names after filtering.' }
+        $result | Should -BeOfType [Array]
+        ($result | Measure-Object).Count | Should -Be 2
     }
 }
 
@@ -206,8 +206,8 @@ Describe 'Get-UniqueDisplayReferences' {
 
         $result = @(Get-UniqueDisplayReferences $references)
 
-        if ($result -isnot [Array]) { throw 'Result should be an array.' }
-        if ($result.Count -ne 1) { throw 'Expected one unique reference.' }
+        $result | Should -BeOfType [Array]
+        $result.Count | Should -Be 1
     }
 
     It 'removes duplicate references' {
@@ -219,7 +219,7 @@ Describe 'Get-UniqueDisplayReferences' {
 
         $result = @(Get-UniqueDisplayReferences $references)
 
-        if ($result.Count -ne 2) { throw 'Expected two unique references after deduplication.' }
+        $result.Count | Should -Be 2
     }
 
     It 'handles empty array input' {
@@ -227,15 +227,15 @@ Describe 'Get-UniqueDisplayReferences' {
 
         $result = @(Get-UniqueDisplayReferences $references)
 
-        if ($result -isnot [Array]) { throw 'Result should be an array.' }
-        if ($result.Count -ne 0) { throw 'Expected empty array for empty input.' }
+        $result | Should -BeOfType [Array]
+        $result.Count | Should -Be 0
     }
 
     It 'handles null input gracefully' {
         $result = @(Get-UniqueDisplayReferences $null)
 
-        if ($result -isnot [Array]) { throw 'Result should be an array.' }
-        if ($result.Count -ne 0) { throw 'Expected empty array for null input.' }
+        $result | Should -BeOfType [Array]
+        $result.Count | Should -Be 0
     }
 }
 
@@ -248,14 +248,14 @@ Describe 'Optimize-ProfileKeys' {
 
         $mapping = Optimize-ProfileKeys -Config $config
 
-        if ($config.Keys.Count -ne 3) { throw 'Should still have 3 profiles.' }
-        if (-not $config.Contains('1')) { throw 'Should have profile 1.' }
-        if (-not $config.Contains('2')) { throw 'Should have profile 2.' }
-        if (-not $config.Contains('3')) { throw 'Should have profile 3.' }
-        if ($config.Contains('5')) { throw 'Should not have profile 5 anymore.' }
+        $config.Keys.Count | Should -Be 3
+        $config.Contains('1') | Should -Be $true
+        $config.Contains('2') | Should -Be $true
+        $config.Contains('3') | Should -Be $true
+        $config.Contains('5') | Should -Be $false
         
-        if ($mapping['3'] -ne '2') { throw 'profile 3 should map to 2.' }
-        if ($mapping['5'] -ne '3') { throw 'profile 5 should map to 3.' }
+        $mapping['3'] | Should -Be '2'
+        $mapping['5'] | Should -Be '3'
     }
 
     It 'preserves data when renumbering' {
@@ -265,10 +265,10 @@ Describe 'Optimize-ProfileKeys' {
 
         Optimize-ProfileKeys -Config $config
 
-        if ($config['1'].activeDisplays[0] -ne 'DisplayA') { throw 'profile 1 should have DisplayA.' }
-        if ($config['1'].audio -ne 'AudioA') { throw 'profile 1 should have AudioA.' }
-        if ($config['2'].activeDisplays[0] -ne 'DisplayC') { throw 'profile 2 should have DisplayC.' }
-        if ($config['2'].audio -ne 'AudioB') { throw 'profile 2 should have AudioB.' }
+        $config['1'].activeDisplays[0] | Should -Be 'DisplayA'
+        $config['1'].audio | Should -Be 'AudioA'
+        $config['2'].activeDisplays[0] | Should -Be 'DisplayC'
+        $config['2'].audio | Should -Be 'AudioB'
     }
 
     It 'returns empty mapping when already sequential' {
@@ -279,7 +279,7 @@ Describe 'Optimize-ProfileKeys' {
 
         $mapping = Optimize-ProfileKeys -Config $config
 
-        if ($mapping.Count -ne 0) { throw 'Should return empty mapping when already sequential.' }
+        $mapping.Count | Should -Be 0
     }
 
     It 'skips _documentation keys during renumbering' {
@@ -290,10 +290,10 @@ Describe 'Optimize-ProfileKeys' {
 
         Optimize-ProfileKeys -Config $config
 
-        if (-not $config.Contains('_documentation')) { throw 'Should preserve _documentation key.' }
-        if (-not $config.Contains('1')) { throw 'Should have profile 1.' }
-        if (-not $config.Contains('2')) { throw 'Should have profile 2.' }
-        if ($config.Contains('5')) { throw 'Should not have profile 5.' }
+        $config.Contains('_documentation') | Should -Be $true
+        $config.Contains('1') | Should -Be $true
+        $config.Contains('2') | Should -Be $true
+        $config.Contains('5') | Should -Be $false
     }
 }
 
