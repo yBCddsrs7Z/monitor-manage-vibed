@@ -767,6 +767,17 @@ NormalizeConfigStructure(config) {
         }
     }
 
+    ; Create hotkeys for any additional numeric profiles that exist (e.g., 7, 8, ...)
+    for key, value in profiles {
+        ; Only process numeric keys (skip any non-numeric metadata that might exist)
+        if (key is "Integer" || RegExMatch(key, "^\d+$")) {
+            if !profileHotkeys.Has(key) {
+                profileHotkeys[key] := NormalizeHotkeyDescriptor(GetDefaultProfileHotkeyDescriptor(key))
+                changed := true
+            }
+        }
+    }
+
     descriptors := ["enableAll", "openConfigurator", "toggleOverlay"]
     for _, option in descriptors {
         existing := GetMapValue(hotkeys, option, "")
