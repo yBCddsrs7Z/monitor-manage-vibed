@@ -1,4 +1,4 @@
-# monitor-manage
+# monitor-manage-vibed
 
 AutoHotkey automation that presents hotkeys for switching between display/audio layouts, with an optional overlay showing layouts and hotkeys.
 
