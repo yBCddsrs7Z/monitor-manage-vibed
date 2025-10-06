@@ -25,19 +25,100 @@ Keep all of these files in the same directory (for example `C:\Progs\monitor-man
 
 ## Installation and Setup
 
-1. **Clone the repository** or download the files to a directory of your choice.
-2. **Check requirements** (optional - modules install automatically):
+### Prerequisites
+
+**Required:**
+- Windows 10/11
+- PowerShell 5.1+ (built-in) or PowerShell 7+ (recommended)
+- AutoHotkey v2 - [Download here](https://www.autohotkey.com/v2/)
+
+**Auto-installed:**
+- `DisplayConfig` PowerShell module (installs on first run)
+- `AudioDeviceCmdlets` PowerShell module (installs on first run)
+
+### Quick Install
+
+1. **Download the project:**
+   ```powershell
+   git clone https://github.com/yBCddsrs7Z/monitor-manage-vibed.git
+   cd monitor-manage-vibed
+   ```
+   
+   Or download as ZIP and extract to a folder like `C:\Progs\monitor-manage`
+
+2. **Check requirements:**
    ```powershell
    pwsh -File scripts/check_requirements.ps1
    ```
-   This verifies that required PowerShell modules (`DisplayConfig` and `AudioDeviceCmdlets`) are installed and offers to install them if missing.
    
-   **Note:** Modules are also installed automatically when you first run any script that needs them.
-| `Left Alt+Left Shift+8` | Enable every detected display (panic button) |
-| `Left Alt+Left Shift+9` | Open the PowerShell configuration helper |
-| `Left Alt+Left Shift+0` | Toggle the on-screen overlay showing all profiles |
+3. **Install required modules** (if not auto-installing):
+   ```powershell
+   Install-Module -Name DisplayConfig -Scope CurrentUser -Force
+   Install-Module -Name AudioDeviceCmdlets -Scope CurrentUser -Force
+   ```
 
-Hotkeys are registered dynamically based on the highest numeric key in `config.json`.
+4. **Set execution policy** (if needed):
+   ```powershell
+   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+   ```
+
+5. **Run the script:**
+   - Double-click `monitor-toggle.ahk` to start
+   - Or right-click → Run with AutoHotkey v2
+
+### First-Time Setup Guide
+
+Once `monitor-toggle.ahk` is running:
+
+1. **Export your devices:**
+   ```powershell
+   pwsh -File scripts/export_devices.ps1
+   ```
+   This creates `devices_snapshot.json` with your current displays and audio devices.
+
+2. **Open the configurator:**
+   - Press `Left Alt+Left Shift+9`
+   - Or run: `pwsh -File scripts/configure_profiles.ps1`
+
+3. **Create your first profile:**
+   - Choose option **1** (Add new profile)
+   - Select which displays should be **active** (enabled)
+   - Select which displays should be **disabled**
+   - Choose your audio output device (optional)
+   - Repeat for additional profiles
+
+4. **Test your profiles:**
+   - Press `Left Alt+Left Shift+1` to activate Profile 1
+   - Press `Left Alt+Left Shift+2` to activate Profile 2
+   - etc.
+
+5. **View your profiles:**
+   - Press `Left Alt+Left Shift+0` to toggle the overlay
+   - Shows all configured profiles and their hotkeys
+
+### Default Hotkeys
+
+| Hotkey | Action |
+|--------|--------|
+| `Left Alt+Left Shift+1-6` | Switch to profile 1-6 |
+| `Left Alt+Left Shift+7` | Cycle audio output device |
+| `Left Alt+Left Shift+8` | Enable all displays (panic button) |
+| `Left Alt+Left Shift+9` | Open configurator |
+| `Left Alt+Left Shift+0` | Toggle profile overlay |
+
+### Verify Installation
+
+Check everything works:
+```powershell
+# Verify modules are installed
+Get-Module -ListAvailable DisplayConfig, AudioDeviceCmdlets
+
+# Validate your config
+pwsh -File scripts/Validate-Config.ps1
+
+# Run tests (optional)
+pwsh -File tests/run-all-tests.ps1
+```
 
 ## Configuring profiles
 - **Interactive workflow:** Press `Left Alt+Left Shift+9` (or run `scripts/configure_profiles.ps1`) to edit groups interactively. The script loads the current configuration, lists detected displays from `devices_snapshot.json`, and lets you add/edit/remove groups without touching JSON by hand.
