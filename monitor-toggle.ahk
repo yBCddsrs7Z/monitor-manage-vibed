@@ -758,23 +758,13 @@ NormalizeConfigStructure(config) {
         }
     }
 
-    ; Ensure default profiles 1-6 exist
+    ; Ensure default profile hotkeys 1-6 exist
+    ; (Users can add profiles 7, 8, etc. but must configure hotkeys manually)
     Loop 6 {
         key := String(A_Index)
         if !profileHotkeys.Has(key) {
             profileHotkeys[key] := NormalizeHotkeyDescriptor(GetDefaultProfileHotkeyDescriptor(key))
             changed := true
-        }
-    }
-
-    ; Create hotkeys for any additional numeric profiles that exist (e.g., 7, 8, ...)
-    for key, value in profiles {
-        ; Only process numeric keys (skip any non-numeric metadata that might exist)
-        if (key is "Integer" || RegExMatch(key, "^\d+$")) {
-            if !profileHotkeys.Has(key) {
-                profileHotkeys[key] := NormalizeHotkeyDescriptor(GetDefaultProfileHotkeyDescriptor(key))
-                changed := true
-            }
         }
     }
 
