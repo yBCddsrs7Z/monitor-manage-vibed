@@ -42,7 +42,7 @@ GetMapValue(map, key, defaultValue := "") {
         } catch {
         }
         try {
-            if ObjHasOwnProp(map, key) {
+            if map.HasOwnProp(key) {
                 return map.%key%
             }
         } catch {

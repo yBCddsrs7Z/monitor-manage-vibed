@@ -744,7 +744,7 @@ NormalizeConfigStructure(config) {
             continue
         }
         ; Check if key is numeric
-        if !(key is "Integer" || RegExMatch(key, "^\d+$")) {
+        if !(key is Integer || RegExMatch(key, "^\d+$")) {
             invalidKeys.Push(key)
             LogMessage("Warning: Removing non-numeric profile key '" key "'. Profile keys must be numbers.")
         }
@@ -1123,7 +1123,7 @@ GetMapValue(map, key, defaultValue := "") {
         }
 
         try {
-            if ObjHasOwnProp(map, key) {
+            if map.HasOwnProp(key) {
                 return map.%key%
             }
         } catch {
@@ -1165,7 +1165,7 @@ BuildProfileSummary(config, maxIndex, hotkeySettings := "") {
 
     Loop maxIndex {
         keyStr := String(A_Index)
-        profile := GetMapValue(config, keyStr, {})
+        profile := GetMapValue(config, keyStr, Map())
 
         if !IsObject(profile) {
             continue
@@ -1355,7 +1355,7 @@ ValidateConfigAndNotify() {
     ; Execute validation and capture output
     command := 'pwsh.exe -NoProfile -ExecutionPolicy Bypass -File "' validateScript '" -ConfigPath "' config_file '" 2>&1'
     try {
-        output := ComObjCreate("WScript.Shell").Exec(command).StdOut.ReadAll()
+        output := ComObject("WScript.Shell").Exec(command).StdOut.ReadAll()
     } catch Error as err {
         LogMessage("Failed to run validation: " err.Message)
         return true  ; Assume valid if validation failed to run
