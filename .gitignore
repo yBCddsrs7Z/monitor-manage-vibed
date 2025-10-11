@@ -18,3 +18,4 @@ tests/devices_snapshot.*.json
 tests/snapshot.*.json
 # Git backup
 .git.backup/
+tests/devices_export_test.json
